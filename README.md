@@ -1,4 +1,4 @@
-# Python Trading Robot
+# Python Trading Robot for Lloyd
 
 ## Table of Contents
 
