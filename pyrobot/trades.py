@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import List
 from typing import Dict
 
-from td.client import TDClient
+from td.client import TdAmeritradeClient
 
 
 class Trade():
@@ -38,7 +38,7 @@ class Trade():
         self._triggered_added = False
         self._multi_leg = False
         self._one_cancels_other = False
-        self._td_client: TDClient = None
+        self._td_client: TdAmeritradeClient = None
     
     def to_dict(self) -> dict:
 

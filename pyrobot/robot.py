@@ -15,12 +15,7 @@ from pyrobot.trades import Trade
 from pyrobot.portfolio import Portfolio
 from pyrobot.stock_frame import StockFrame
 
-from td.client import TDClient
-from td.utils import TDUtilities
-
-# We are going to be doing some timestamp conversions.
-milliseconds_since_epoch = TDUtilities().milliseconds_since_epoch
-
+from td.client import TdAmeritradeClient
 
 class PyRobot():
 
@@ -49,7 +44,7 @@ class PyRobot():
         self.client_id = client_id
         self.redirect_uri = redirect_uri
         self.credentials_path = credentials_path
-        self.session: TDClient = self._create_session()
+        self.session: TdAmeritradeClient = self._create_session()
         self.trades = {}
         self.historical_prices = {}
         self.stock_frame: StockFrame = None
@@ -58,7 +53,7 @@ class PyRobot():
         self._bar_size = None
         self._bar_type = None
 
-    def _create_session(self) -> TDClient:
+    def _create_session(self) -> TdAmeritradeClient:
         """Start a new session.
 
         Creates a new session with the TD Ameritrade API and logs the user into
@@ -66,12 +61,12 @@ class PyRobot():
 
         Returns:
         ----
-        TDClient -- A TDClient object with an authenticated sessions.
+        TdAmeritradeClient -- A TdAmeritradeClient object with an authenticated sessions.
 
         """
 
         # Create a new instance of the client
-        td_client = TDClient(
+        td_client = TdAmeritradeClient(
             client_id=self.client_id,
             redirect_uri=self.redirect_uri,
             credentials_path=self.credentials_path
@@ -491,9 +486,6 @@ class PyRobot():
         self._bar_size = bar_size
         self._bar_type = bar_type
 
-        start = str(milliseconds_since_epoch(dt_object=start))
-        end = str(milliseconds_since_epoch(dt_object=end))
-
         new_prices = []
 
         if not symbols:
@@ -553,10 +545,8 @@ class PyRobot():
         bar_type = self._bar_type
 
         # Define the start and end date.
-        end_date = datetime.today()
-        start_date = end_date - timedelta(days=1)
-        start = str(milliseconds_since_epoch(dt_object=start_date))
-        end = str(milliseconds_since_epoch(dt_object=end_date))
+        end = datetime.today()
+        start = end - timedelta(days=1)
 
         latest_prices = []
 
