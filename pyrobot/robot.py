@@ -16,6 +16,7 @@ from pyrobot.portfolio import Portfolio
 from pyrobot.stock_frame import StockFrame
 
 from td.client import TdAmeritradeClient
+from td.client import TdCredentials
 
 class PyRobot():
 
@@ -66,14 +67,15 @@ class PyRobot():
         """
 
         # Create a new instance of the client
-        td_client = TdAmeritradeClient(
+        td_credentials =  TdCredentials(
             client_id=self.client_id,
             redirect_uri=self.redirect_uri,
-            credentials_path=self.credentials_path
+            credential_file=self.credentials_path
         )
 
-        # log the client into the new session
-        td_client.login()
+        td_client = TdAmeritradeClient(
+            credentials=td_credentials
+        )
 
         return td_client
 
@@ -434,7 +436,7 @@ class PyRobot():
         symbols = self.portfolio.positions.keys()
 
         # Grab the quotes.
-        quotes = self.session.get_quotes(instruments=list(symbols))
+        quotes = self.session.quotes().get_quotes(instruments=list(symbols))
 
         return quotes
 
@@ -493,13 +495,13 @@ class PyRobot():
 
         for symbol in symbols:
 
-            historical_prices_response = self.session.get_price_history(
+            historical_prices_response = self.session.price_history().get_price_history(
                 symbol=symbol,
+                frequency_type=bar_type,
+                frequency=bar_size,
                 period_type='day',
                 start_date=start,
                 end_date=end,
-                frequency_type=bar_type,
-                frequency=bar_size,
                 extended_hours=True
             )
 
@@ -556,31 +558,32 @@ class PyRobot():
             try:
 
                 # Grab the request.
-                historical_prices_response = self.session.get_price_history(
+
+                historical_prices_response = self.session.price_history().get_price_history(
                     symbol=symbol,
+                    frequency_type=bar_type,
+                    frequency=bar_size,
                     period_type='day',
                     start_date=start,
                     end_date=end,
-                    frequency_type=bar_type,
-                    frequency=bar_size,
                     extended_hours=True
                 )
+
 
             except:
 
                 time_true.sleep(2)
 
                 # Grab the request.
-                historical_prices_response = self.session.get_price_history(
+                historical_prices_response = self.session.price_history().get_price_history(
                     symbol=symbol,
+                    frequency_type=bar_type,
+                    frequency=bar_size,
                     period_type='day',
                     start_date=start,
                     end_date=end,
-                    frequency_type=bar_type,
-                    frequency=bar_size,
                     extended_hours=True
                 )
-
             # parse the candles.
             for candle in historical_prices_response['candles'][-1:]:
 
@@ -806,9 +809,9 @@ class PyRobot():
         """
 
         # Execute the order.
-        order_dict = self.session.place_order(
-            account=self.trading_account,
-            order=trade_obj.order
+        order_dict = self.session.orders().place_order(
+            account_id=self.trading_account,
+            order_object=trade_obj.order
         )
 
         # Store the order.
@@ -920,7 +923,7 @@ class PyRobot():
             account = account_number
 
         # Grab the accounts.
-        accounts = self.session.get_accounts(
+        accounts = self.session.accounts().get_accounts(
             account=account
         )
 
@@ -1125,7 +1128,7 @@ class PyRobot():
             account = account_number
 
         # Grab the positions.
-        positions = self.session.get_accounts(
+        positions = self.session.accounts().get_accounts(
             account=account,
             fields=['positions']
         )
